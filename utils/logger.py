@@ -1,7 +1,7 @@
 import logging
 import sys
 import os
-from src.common.config import CommonConfig
+from common.configs.env import CommonConfig
 def get_logger(name: str) -> logging.Logger:
     """
     Production-ready logger for microservices (Kubernetes/Docker).
