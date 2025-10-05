@@ -9,3 +9,4 @@ class CommonConfig:
     COOKIE_HTTP_ONLY: bool = os.environ['COOKIE_HTTP_ONLY']
     COOKIE_SAMESITE:Literal['Strict','Lax','None']  = os.environ['COOKIE_SAMESITE']
     COOKIE_SECURE:bool = os.environ['COOKIE_SECURE']
+    CSRF_SECRET_KEY = os.environ['CSRF_SECRET_KEY']
