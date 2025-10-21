@@ -1,29 +1,36 @@
 import logging
 import sys
-import os
+from pythonjsonlogger import jsonlogger
 from common.configs.env import CommonConfig
+
 def get_logger(name: str) -> logging.Logger:
     """
-    Production-ready logger for microservices (Kubernetes/Docker).
-    Logs to stdout with structured format.
-    Log level can be controlled via LOG_LEVEL env var.
+    Universal JSON logger for FastAPI microservices.
+    - Same format in DEV & PROD
+    - Structured JSON logs (ideal for Fluentd, Loki, ELK, etc.)
+    - Configurable log level via CommonConfig.LOG_LEVEL
     """
     log_level = CommonConfig.LOG_LEVEL
-
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
 
-    # Avoid duplicate handlers if logger is re-imported
     if logger.hasHandlers():
         return logger
 
-    formatter = logging.Formatter(
-        fmt="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%SZ"
+    handler = logging.StreamHandler(sys.stdout)
+
+    formatter = jsonlogger.JsonFormatter(
+        "%(asctime)s %(levelname)s %(name)s %(message)s",
+        rename_fields={
+            "asctime": "timestamp",
+            "levelname": "level",
+            "name": "logger",
+            "message": "msg"
+        },
+        json_ensure_ascii=False,
     )
 
-    handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(formatter)
-
     logger.addHandler(handler)
+
     return logger
