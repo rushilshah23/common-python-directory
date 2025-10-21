@@ -2,6 +2,14 @@ import logging
 import sys
 from pythonjsonlogger import jsonlogger
 from common.configs.env import CommonConfig
+from asgi_correlation_id import correlation_id
+
+class CorrelationIdFilter(logging.Filter):
+    """Inject correlation_id into every log record."""
+    def filter(self, record):
+        record.correlation_id = correlation_id.get() or "N/A"
+        return True
+
 
 def get_logger(name: str) -> logging.Logger:
     """
@@ -18,6 +26,7 @@ def get_logger(name: str) -> logging.Logger:
         return logger
 
     handler = logging.StreamHandler(sys.stdout)
+    handler.addFilter(CorrelationIdFilter())
 
     formatter = jsonlogger.JsonFormatter(
         "%(asctime)s %(levelname)s %(name)s %(message)s",
